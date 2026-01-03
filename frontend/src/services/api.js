@@ -1,11 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = "https://finmate-api-wbp9.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 10000, // 10 seconds
 });
@@ -13,11 +13,11 @@ const api = axios.create({
 // Request interceptor for debugging
 api.interceptors.request.use(
   (config) => {
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log("API Request:", config.method?.toUpperCase(), config.url);
     return config;
   },
   (error) => {
-    console.error('API Request Error:', error);
+    console.error("API Request Error:", error);
     return Promise.reject(error);
   }
 );
@@ -25,11 +25,11 @@ api.interceptors.request.use(
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.status, response.config.url);
+    console.log("API Response:", response.status, response.config.url);
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.data || error.message);
+    console.error("API Response Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
