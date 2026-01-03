@@ -1,7 +1,7 @@
-require('dotenv').config();
-console.log('DB_USER from .env:', process.env.DB_USER); // Should print 'varnan'
+require("dotenv").config();
+console.log("DB_USER from .env:", process.env.DB_USER); // Should print 'varnan'
 
-const app = require('./app');
+const app = require("./app");
 
 const PORT = process.env.PORT || 5000;
 

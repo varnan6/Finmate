@@ -1,24 +1,23 @@
-const mysql = require('mysql2/promise');
-require('dotenv').config();
+// config/database.js
+const { Pool } = require("pg");
+require("dotenv").config();
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'finmate',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+// Example: use single Supabase URL env
+// SUPABASE_DB_URL=postgres://user:pass@host:5432/postgres
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }, // Supabase requires SSL
 });
 
 // Test connection
-pool.getConnection()
-  .then(connection => {
-    console.log('✅ Database connected successfully');
-    connection.release();
+pool
+  .connect()
+  .then((client) => {
+    console.log("✅ Database connected successfully");
+    client.release();
   })
-  .catch(err => {
-    console.error('❌ Database connection failed:', err.message);
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err.message);
   });
 
 module.exports = pool;

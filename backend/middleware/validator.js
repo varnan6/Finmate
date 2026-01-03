@@ -6,7 +6,7 @@ const validateExpense = async (req, res, next) => {
   // Basic validation
   if (!title || !amount || !date) {
     return res.status(400).json({
-      error: 'Title, amount, and date are required'
+      error: 'Title, amount, and date are required',
     });
   }
 
@@ -22,19 +22,18 @@ const validateExpense = async (req, res, next) => {
   // Only validate category for expenses (NOT for income)
   if (type === 'expense') {
     const { category_id } = req.body;
-    
     if (!category_id) {
       return res.status(400).json({ error: 'Category is required for expenses' });
     }
 
     // Check if category exists
     try {
-      const [categories] = await pool.query(
-        'SELECT id FROM categories WHERE id = ?',
+      const categoryResult = await pool.query(
+        'SELECT id FROM categories WHERE id = $1',
         [category_id]
       );
 
-      if (categories.length === 0) {
+      if (categoryResult.rows.length === 0) {
         return res.status(400).json({ error: 'Invalid category' });
       }
     } catch (error) {
@@ -44,15 +43,14 @@ const validateExpense = async (req, res, next) => {
   } else if (type === 'income') {
     // For income, category_id should be null
     const { category_id } = req.body;
-    
     if (category_id) {
       try {
-        const [categories] = await pool.query(
-          'SELECT id FROM categories WHERE id = ?',
+        const categoryResult = await pool.query(
+          'SELECT id FROM categories WHERE id = $1',
           [category_id]
         );
 
-        if (categories.length === 0) {
+        if (categoryResult.rows.length === 0) {
           return res.status(400).json({ error: 'Invalid category' });
         }
       } catch (error) {
@@ -61,7 +59,6 @@ const validateExpense = async (req, res, next) => {
       }
     }
   }
-
   next();
 };
 
@@ -73,7 +70,7 @@ const validateExpenseUpdate = async (req, res, next) => {
   // Basic validation
   if (!title || !amount || !date) {
     return res.status(400).json({
-      error: 'Title, amount, and date are required'
+      error: 'Title, amount, and date are required',
     });
   }
 
@@ -90,16 +87,15 @@ const validateExpenseUpdate = async (req, res, next) => {
     // Get current expense type if type is not provided in the request
     let currentType = type;
     if (!currentType) {
-      const [expenses] = await pool.query(
-        'SELECT type FROM expenses WHERE id = ?',
+      const expenseResult = await pool.query(
+        'SELECT type FROM expenses WHERE id = $1',
         [expenseId]
       );
 
-      if (expenses.length === 0) {
+      if (expenseResult.rows.length === 0) {
         return res.status(404).json({ error: 'Expense not found' });
       }
-
-      currentType = expenses[0].type;
+      currentType = expenseResult.rows[0].type;
     }
 
     // Validate category based on type
@@ -109,26 +105,25 @@ const validateExpenseUpdate = async (req, res, next) => {
       }
 
       // Check if category exists
-      const [categories] = await pool.query(
-        'SELECT id FROM categories WHERE id = ?',
+      const categoryResult = await pool.query(
+        'SELECT id FROM categories WHERE id = $1',
         [category_id]
       );
 
-      if (categories.length === 0) {
+      if (categoryResult.rows.length === 0) {
         return res.status(400).json({ error: 'Invalid category' });
       }
     } else if (currentType === 'income' && category_id) {
       // If income and category is provided, validate it exists
-      const [categories] = await pool.query(
-        'SELECT id FROM categories WHERE id = ?',
+      const categoryResult = await pool.query(
+        'SELECT id FROM categories WHERE id = $1',
         [category_id]
       );
 
-      if (categories.length === 0) {
+      if (categoryResult.rows.length === 0) {
         return res.status(400).json({ error: 'Invalid category' });
       }
     }
-
     next();
   } catch (error) {
     console.error('Validation error:', error);
@@ -138,16 +133,15 @@ const validateExpenseUpdate = async (req, res, next) => {
 
 const validateCategory = (req, res, next) => {
   const { name } = req.body;
-
   if (!name) {
     return res.status(400).json({ error: 'Category name is required' });
   }
-
   next();
 };
 
 module.exports = {
   validateExpense,
   validateExpenseUpdate,
-  validateCategory
+  validateCategory,
 };
+
