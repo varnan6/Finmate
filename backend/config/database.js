@@ -1,12 +1,13 @@
-// config/database.js
 const { Pool } = require("pg");
 require("dotenv").config();
 
-// Example: use single Supabase URL env
-// SUPABASE_DB_URL=postgres://user:pass@host:5432/postgres
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // Supabase requires SSL
+  connectionString: process.env.SUPABASE_DB_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+  host: process.env.SUPABASE_DB_URL?.split("@")[1]?.split(":")[0], // Extract host
+  port: 5432,
 });
 
 // Test connection
